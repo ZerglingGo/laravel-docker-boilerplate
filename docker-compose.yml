@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php.Dockerfile
+    image: localhost:5000/php
+    container_name: ${APP_NAME:?err}-php
+    depends_on:
+      - mariadb
+      - redis
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx.Dockerfile
+    image: localhost:5000/nginx
+    container_name: ${APP_NAME:?err}-nginx
+    depends_on:
+      - php
+    ports:
+      - 80:80
+    volumes:
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+
+  mariadb:
+    image: mariadb:10.9
+    container_name: ${APP_NAME:?err}-mariadb
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:?err}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?err}
+    volumes:
+      - database:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: ${APP_NAME:?err}-redis
+    restart: on-failure
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: ./docker/php.Dockerfile
+    image: localhost:5000/php
+    container_name: ${APP_NAME:?err}-scheduler
+    user: root
+    restart: always
+    volumes:
+      - ./docker/scheduler/supervisor:/etc/supervisor/conf.d
+      - ./docker/scheduler/cron:/etc/cron.d
+      - ./docker/scheduler/entrypoint:/docker-entrypoint
+    depends_on:
+      - mariadb
+      - redis
+    working_dir: /docker-entrypoint
+    entrypoint: ['bash', './docker-cron-entrypoint.sh']
+
+volumes:
+    database:
