@@ -9,19 +9,19 @@ services:
     depends_on:
       - mariadb
       - redis
+    volumes:
+      - ./app:/var/www/html
 
   nginx:
-    build:
-      context: .
-      dockerfile: ./docker/nginx.Dockerfile
-    image: localhost:5000/nginx
+    image: nginx:latest
     container_name: ${APP_NAME:?err}-nginx
     depends_on:
       - php
     ports:
       - 80:80
     volumes:
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./app:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
 
   mariadb:
     image: mariadb:10.9
@@ -47,6 +47,7 @@ services:
     user: root
     restart: always
     volumes:
+      - ./app:/var/www/html
       - ./docker/scheduler/supervisor:/etc/supervisor/conf.d
       - ./docker/scheduler/cron:/etc/cron.d
       - ./docker/scheduler/entrypoint:/docker-entrypoint

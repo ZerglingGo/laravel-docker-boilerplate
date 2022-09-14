@@ -1,4 +1,4 @@
-docker-compose --env-file ./app/.env build
+sudo docker-compose --env-file ./app/.env build
 
 if [ $? -eq 0 ]; then
     echo -e "\n=======================================\n\e[1;32m\tCompleted build laravel\e[0m\n=======================================\n"
