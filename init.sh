@@ -1,3 +1,5 @@
+#!/bin/sh
+
 if [ -d "app" ]; then
     echo "app Directory exists. Already initialized project?"
     exit 1
@@ -5,7 +7,6 @@ fi
 
 docker run --rm -it \
     --volume "$(pwd):/app" \
-    --user $(id -u):$(id -g) \
     composer:2 \
     sh -c " \
         composer create-project laravel/laravel app && \
@@ -28,7 +29,6 @@ chmod -R 777 app/bootstrap/cache app/storage
 
 docker run --rm -it \
     --volume "$(pwd):/app" \
-    --user $(id -u):$(id -g) \
     --workdir "/app/app" \
     node:lts \
     sh -c " \

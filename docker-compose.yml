@@ -49,7 +49,6 @@ services:
     volumes:
       - ./app:/var/www/html
       - ./docker/scheduler/supervisor:/etc/supervisor/conf.d
-      - ./docker/scheduler/cron:/etc/cron.d
       - ./docker/scheduler/entrypoint:/docker-entrypoint
     depends_on:
       - mariadb

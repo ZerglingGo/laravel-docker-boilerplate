@@ -1,3 +1,5 @@
+#!/bin/sh
+
 docker compose build
 
 if [ $? -eq 0 ]; then
